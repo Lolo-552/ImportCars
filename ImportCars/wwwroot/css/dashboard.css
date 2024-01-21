@@ -12865,3 +12865,26 @@ body {
     font-size: 0.75rem;
     border-radius: 0.375rem !important;
 }
+
+
+
+
+
+
+
+
+
+.box {
+    padding: 15px 22px;
+    background: #fff;
+    border: none;
+    border-radius: 0;
+    margin: 40px;
+    box-shadow: 1px 1px 16px rgba(0, 0, 0, 0.1);
+    overflow-x: auto;
+}
+
+.button-box > .btn {
+    line-height: 1;
+    padding: 4px;
+}

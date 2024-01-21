@@ -16,5 +16,7 @@ namespace ImportCars.Data
 
         public DbSet<ImportCars.Models.Auctions> Auctions { get; set; } = default!;
         public DbSet<ImportCars.Areas.Admin.Models.Admin> Admin { get; set; } = default!;
+        public DbSet<ImportCars.Models.Images> Images { get; set; } = default!;
+        public DbSet<ImportCars.Models.Questions>? Questions { get; set; }
     }
 }

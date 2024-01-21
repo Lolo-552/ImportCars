@@ -1,5 +1,8 @@
-﻿using ImportCars.Models;
+﻿using ImportCars.Data;
+using ImportCars.Models;
+using ImportCars.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace ImportCars.Controllers
@@ -7,15 +10,23 @@ namespace ImportCars.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly Context _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, Context contex)
         {
             _logger = logger;
+            _context = contex;
         }
 
+        
         public IActionResult Index()
         {
-            return View();
+            var model = new HomePageModel
+            {
+                Auctions = _context.Auctions.Include(x => x.Images).Where(y => y.EndDate >= DateTime.Now).OrderByDescending(z => z.EndDate).ToList(),
+            };
+
+            return View(model);
         }
 
         public IActionResult Privacy()

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ImportCars.Data;
+﻿using ImportCars.Data;
 using ImportCars.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Headers;
 
 namespace ImportCars.Areas.Admin.Controllers
 {
@@ -57,15 +54,39 @@ namespace ImportCars.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,EndDate")] Auctions auctions)
+        public async Task<IActionResult> Create([Bind("Id,Name,EndDate,ProductionYear,EngineType,EngineCapacity,Url,Price")] Auctions auctions, List<IFormFile> images)
         {
+            // Sprawdzam czy zdjęcie nie ma złego rozszerzenia
+            bool fileValid = ValidateFiles(images, ModelState);
+            if (!fileValid)
+            {
+                return View(auctions);
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(auctions);
                 await _context.SaveChangesAsync();
+
+                // Zdjęcia
+                List<Images> savedPhotos = await SavePhotosAsync(auctions.Id, images);
+
                 return RedirectToAction(nameof(Index));
             }
-            return View(auctions);
+            else
+            {
+                // Logowanie błędów ModelState
+                foreach (var modelStateEntry in ModelState.Values)
+                {
+                    foreach (var error in modelStateEntry.Errors)
+                    {
+                        // Tutaj możesz zrobić coś z błędem, np. zalogować go
+                        Console.WriteLine($"Błąd walidacji: {error.ErrorMessage}");
+                    }
+                }
+
+                return View(auctions);
+            }
         }
 
         // GET: Admin/Auctions/Edit/5
@@ -146,9 +167,29 @@ namespace ImportCars.Areas.Admin.Controllers
             {
                 return Problem("Entity set 'Context.Auctions'  is null.");
             }
-            var auctions = await _context.Auctions.FindAsync(id);
+
+
+            var auctions = _context.Auctions.Include(n => n.Images)
+                        .FirstOrDefault(n => n.Id == id);
+
             if (auctions != null)
             {
+                string rootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+
+                if (auctions.Images != null)
+                {
+                    _context.Images.RemoveRange(auctions.Images);
+
+                    foreach (var item in _context.Images.Where(x => x.Id == auctions.Id))
+                    {
+                        FileInfo file = new FileInfo(rootPath + item.Path.Replace("~", ""));
+                        if (file.Exists)
+                        {
+                            file.Delete();
+                        }
+                    }
+                }
+
                 _context.Auctions.Remove(auctions);
             }
             
@@ -158,7 +199,57 @@ namespace ImportCars.Areas.Admin.Controllers
 
         private bool AuctionsExists(int id)
         {
+
+
           return (_context.Auctions?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+
+        public bool ValidateFiles(List<IFormFile> photos, ModelStateDictionary modelState)
+        {
+            //walidacja po stronie serwera, jeśli chcesz dodać wiecej rozszerzenie zmień również liste rozszerzeń w pliku admin-panel.js
+            bool filesValid = true;
+
+            foreach (var item in photos)
+            {
+                if (!new[] { ".jpg", ".jpeg", ".png" }.Contains(Path.GetExtension(item.FileName.ToLower())))
+                {
+                    modelState.AddModelError("photoExtError", "Akceptowane są tylko pliki .png .jpeg .jpg");
+                    filesValid = false;
+                }
+            }
+
+            return filesValid;
+        }
+
+        private async Task<List<Images>> SavePhotosAsync(int imageId, List<IFormFile> photos)
+        {
+            List<Images> savedPhotos = new List<Images>();
+            if (photos != null)
+            {
+                foreach (var formFile in photos)
+                {
+                    Random random = new Random();
+                    string randomString = new string(Enumerable.Range(0, 10).Select(i => (char)('a' + random.Next(26))).ToArray());
+                    string? formFileName = ContentDispositionHeaderValue.Parse(formFile.ContentDisposition).FileName?.Trim('"');
+                    string filePath = "auction_" + imageId + "_image_" + randomString + Path.GetExtension(formFileName);
+                    string path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", "projects", filePath);
+
+                    using (System.IO.Stream stream = new FileStream(path, FileMode.Create))
+                    {
+                        await formFile.CopyToAsync(stream);
+                    }
+
+                    Images photo = new Images("~/img/projects/" + filePath)
+                    {
+                        AuctionId = imageId
+                    };
+                    _context.Images.Add(photo);
+                    await _context.SaveChangesAsync();
+
+                    savedPhotos.Add(photo);
+                }
+            }
+            return savedPhotos;
         }
     }
 }
