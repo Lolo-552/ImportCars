@@ -5882,7 +5882,7 @@ textarea.form-control-lg {
 
 .carousel-control-prev-icon
 {
-    color: black;
+    color: black!important;
 }
 .card-subtitle {
     margin-top: calc(-0.5 * var(--bs-card-title-spacer-y));
@@ -6208,9 +6208,10 @@ textarea.form-control-lg {
     color: var(--bs-breadcrumb-item-active-color);
 }
 
-.section-title{
+.section-title {
     font-size: 2rem;
-
+    font-family: "Inter Tight", sans-serif;
+    font-weight: 600
 }
 
 .pagination {
@@ -18357,7 +18358,6 @@ body {
 }
 
 .lift {
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
     transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
@@ -19311,7 +19311,7 @@ body {
     }
 
 .card {
-    box-shadow: 0 0.15rem 1.75rem 0 rgba(33, 40, 50, 0.15);
+
 }
 
     .card .card-header {
@@ -21363,4 +21363,19 @@ section {
     .divider-right {
         border-right: 0.0625rem solid #e0e5ec;
     }
+}
+
+.owl-dots {
+    display: none;
+}
+
+.owl-carousel{
+
+}
+.owl-nav{
+    height: 0px;
+}
+.owl-stage-outer {
+    padding-top: 32px;
+    padding-bottom: 64px;
 }

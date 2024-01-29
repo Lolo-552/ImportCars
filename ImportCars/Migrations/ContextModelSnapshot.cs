@@ -126,11 +126,11 @@ namespace ImportCars.Migrations
 
             modelBuilder.Entity("ImportCars.Models.Images", b =>
                 {
-                    b.HasOne("ImportCars.Models.Auctions", "auction")
+                    b.HasOne("ImportCars.Models.Auctions", "Auction")
                         .WithMany("Images")
                         .HasForeignKey("AuctionId");
 
-                    b.Navigation("auction");
+                    b.Navigation("Auction");
                 });
 
             modelBuilder.Entity("ImportCars.Models.Auctions", b =>

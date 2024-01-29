@@ -24,6 +24,7 @@ namespace ImportCars.Controllers
             var model = new HomePageModel
             {
                 Auctions = _context.Auctions.Include(x => x.Images).Where(y => y.EndDate >= DateTime.Now).OrderByDescending(z => z.EndDate).ToList(),
+                Questions = _context.Questions?.ToList(),
             };
 
             return View(model);

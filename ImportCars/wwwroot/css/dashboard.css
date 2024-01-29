@@ -6618,6 +6618,7 @@ textarea.form-control-lg {
     background-repeat: no-repeat;
     background-position: 50%;
     background-size: 100% 100%;
+    color: black;
 }
 
 /* rtl:options: {
@@ -12737,8 +12738,8 @@ body {
 .datatable-selector {
     width: auto;
     display: inline-block;
-    padding-left: 1.125rem;
-    padding-right: 2.125rem;
+    padding-left: 1.125rem!important;
+    padding-right: 2.125rem!important;
     margin-right: 0.25rem;
 }
 
@@ -12777,7 +12778,7 @@ body {
 
 /* TABLE */
 .datatable-table {
-    border-collapse: collapse;
+    border-collapse: collapse!important;
 }
 
     .datatable-table > tbody > tr > td,
@@ -12887,4 +12888,23 @@ body {
 .button-box > .btn {
     line-height: 1;
     padding: 4px;
+}
+.photo {
+    background-size: cover;
+    background-position: center;
+    height: 200px;
+    position: relative;
+}
+
+.delete-photo-icon {
+    cursor: pointer;
+    color: #dc3545;
+    background: #fff;
+    padding: 5px;
+    border-radius: 50%;
+    position: absolute;
+    right: 5px;
+    top: 5px;
+    width: 30px;
+    height: 30px;
 }

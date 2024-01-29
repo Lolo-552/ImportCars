@@ -25,3 +25,26 @@ window.addEventListener('DOMContentLoaded', event => {
     }
 
 });
+
+
+//foto delete change tyle
+$(document).ready(function () {
+    $('.removePhoto').on('change', function () {
+        var deleteIcon = $(this).siblings('label').find('.delete-photo-icon');
+        if ($(this).is(':checked')) {
+            $(this).closest('.photo').css('opacity', '0.3');
+            deleteIcon.css({
+                'background-color': '#dc3545',
+                'color': '#fff',
+            });
+        } else {
+            $(this).closest('.photo').css('opacity', '1');
+            deleteIcon.css({
+                'background-color': '',
+                'color': '#dc3545',
+            });
+        }
+    });
+});
+
+

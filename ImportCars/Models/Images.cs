@@ -6,7 +6,7 @@ namespace ImportCars.Models
     {
         public int Id { get; set; }
         public int? AuctionId { get; set; }
-        public virtual Auctions? auction { get; set; }
+        public virtual Auctions? Auction { get; set; }
         public string Path { get; set; }
 
         public Images(string path)

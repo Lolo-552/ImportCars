@@ -69,7 +69,7 @@ namespace ImportCars.Areas.Admin.Controllers
                 await _context.SaveChangesAsync();
 
                 // Zdjęcia
-                List<Images> savedPhotos = await SavePhotosAsync(auctions.Id, images);
+                List<Images> savedPhotos = await Helper.SavePhotosAsync(auctions.Id, images, nameof(auctions), nameof(Images.AuctionId), _context);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -102,6 +102,9 @@ namespace ImportCars.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            await _context.Entry(auctions).Collection(x => x.Images).LoadAsync();
+
             return View(auctions);
         }
 
@@ -110,8 +113,13 @@ namespace ImportCars.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,EndDate")] Auctions auctions)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,EndDate,ProductionYear,EngineType,EngineCapacity,Url,Price")] Auctions auctions, List<IFormFile> images, string? selectedPhotosIds)
         {
+            // Sprawdzam czy zdjęcie nie ma złego rozszerzenia
+            bool fileValid = ValidateFiles(images, ModelState);
+            if (!fileValid)
+                return View(auctions);
+
             if (id != auctions.Id)
             {
                 return NotFound();
@@ -121,8 +129,15 @@ namespace ImportCars.Areas.Admin.Controllers
             {
                 try
                 {
+                    // Zdjęcia
+                    List<Images> savedPhotos = await Helper.SavePhotosAsync(auctions.Id, images, nameof(auctions), nameof(Images.AuctionId), _context);
+
                     _context.Update(auctions);
                     await _context.SaveChangesAsync();
+
+                    //usuawnie zdjęć
+                    await Helper.RemovePhotosAsync<Images>(_context, selectedPhotosIds, "auctions", x => x.AuctionId);
+
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -136,6 +151,14 @@ namespace ImportCars.Areas.Admin.Controllers
                     }
                 }
                 return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                // Wyświetl błędy ModelState w konsoli lub zapisz je gdzieś w celu analizy
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    Console.WriteLine($"Error: {error.ErrorMessage}");
+                }
             }
             return View(auctions);
         }
@@ -239,7 +262,7 @@ namespace ImportCars.Areas.Admin.Controllers
                         await formFile.CopyToAsync(stream);
                     }
 
-                    Images photo = new Images("~/img/projects/" + filePath)
+                    Images photo = new Images("~/img/auctions/" + filePath)
                     {
                         AuctionId = imageId
                     };

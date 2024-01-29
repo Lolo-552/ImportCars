@@ -4,5 +4,6 @@ namespace ImportCars.ViewModels;
 
 public class HomePageModel
 {
-    public IEnumerable<Auctions> Auctions { get; set; } = default!;
+    public IEnumerable<Auctions>? Auctions { get; set; }
+    public IEnumerable<Questions>? Questions { get; set; }
 }

@@ -12,14 +12,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ImportCars.Migrations
 {
     [DbContext(typeof(Context))]
-    [Migration("20240120202939_modifyAuctionsTable")]
-    partial class modifyAuctionsTable
+    [Migration("20240128150354_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.21")
+                .HasAnnotation("ProductVersion", "6.0.26")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -105,13 +105,34 @@ namespace ImportCars.Migrations
                     b.ToTable("Images");
                 });
 
+            modelBuilder.Entity("ImportCars.Models.Questions", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Answer")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Questions");
+                });
+
             modelBuilder.Entity("ImportCars.Models.Images", b =>
                 {
-                    b.HasOne("ImportCars.Models.Auctions", "auction")
+                    b.HasOne("ImportCars.Models.Auctions", "Auction")
                         .WithMany("Images")
                         .HasForeignKey("AuctionId");
 
-                    b.Navigation("auction");
+                    b.Navigation("Auction");
                 });
 
             modelBuilder.Entity("ImportCars.Models.Auctions", b =>
