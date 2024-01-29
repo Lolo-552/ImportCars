@@ -30,6 +30,17 @@ namespace ImportCars.Controllers
             return View(model);
         }
 
+
+        public IActionResult AboutUs()
+        {
+            var model = new HomePageModel
+            {
+
+            };
+
+            return View(model);
+        }
+
         public IActionResult Privacy()
         {
             return View();
